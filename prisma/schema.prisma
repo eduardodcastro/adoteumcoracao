@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// create a migration:: yarn prisma migrate dev 
+model User {
+  id String @id @default(uuid())
+  name String
+  email String
+  password String
+  photo String?
+  created_at DateTime? @default(now())
+  update_at DateTime? @default(now())
+
+  pets Pet[]
+  favorites Favorite[]
+  messages Message[]
+
+  @@map("users")
+}
+
+model Pet {
+  id String @id @default(uuid())
+  name String
+  description String
+  photo String
+  adopted Boolean @default(false)
+  created_at DateTime? @default(now())
+  update_at DateTime? @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+  user_id String
+
+  favorites Favorite[]
+  messages Message[]
+
+  @@map("pets")
+}
+
+model Favorite {
+  id String @id @default(uuid())
+  
+  created_at DateTime? @default(now())
+  update_at DateTime? @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+  user_id String
+
+  pet Pet @relation(fields: [pet_id], references: [id])
+  pet_id String
+
+  @@map("favorites")
+}
+
+model Message {
+  id String @id @default(uuid())
+  description String
+  created_at DateTime? @default(now())
+  update_at DateTime? @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+  user_id String
+
+  pet Pet @relation(fields: [pet_id], references: [id])
+  pet_id String
+
+  @@map("messages")
+}
